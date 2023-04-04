@@ -104,12 +104,20 @@ export class User {
                 this.logger.error(`Access Token not define`)
                 return reject()
             }
-            const url = `https://api.snm0516.aisee.tv/x/tv/account/myinfo?access_key=${this._access_token}`
+            // const url = `https://api.snm0516.aisee.tv/x/tv/account/myinfo?access_key=${this._access_token}`
+
+            const params: any = {
+                access_key: this._access_token,
+                appkey: "4409e2ce8ffd12b8",
+                ts: parseInt(String(new Date().valueOf() / 1000))
+            }
+            params.sign = md5(crypt.make_sign(params, "59b43e04ad6965f34319062b478f83dd"))
+            const url = `https://passport.snm0516.aisee.tv/x/passport-login/oauth2/info?access_key=${this._access_token}&appkey=${params.appkey}&ts=${params.ts}&sign=${params.sign}`
             try {
-                const { data: { data, code, message } } = await $axios.request<BiliAPIResponse<GetUserInfoResponse>>({
+                const {data: {data, code, message}} = await $axios.request<BiliAPIResponse<GetUserInfoResponse>>({
                     url
                 })
-
+                console.log("=================", code, message, data)
                 this.logger.debug('Get user info response: ')
                 this.logger.debug(JSON.stringify(data, null, 2))
 
@@ -119,7 +127,9 @@ export class User {
                 }
                 this.logger.info(`Token is valid. ${data.mid} ${data.name}`)
                 this._mid = data.mid
+                this._access_token = data.access_token
                 this._nickname = data.name
+                console.log("======================", data)
                 resolve()
             } catch (err) {
                 this.logger.error(`An error occurred when try to check token: ${err}`)
@@ -159,11 +169,18 @@ export class User {
             }
 
             try {
-                const { data: {
+                const {
                     data: {
-                        token_info
-                    }, code, message
-                } } = await $axios.request<BiliAPIResponse<LoginResponse>>({ url, data: querystring.stringify(params), headers, method: "post" })
+                        data: {
+                            token_info
+                        }, code, message
+                    }
+                } = await $axios.request<BiliAPIResponse<LoginResponse>>({
+                    url,
+                    data: querystring.stringify(params),
+                    headers,
+                    method: "post"
+                })
                 if (code === 0) {
                     this._mid = token_info.mid
                     this._access_token = token_info.access_token
@@ -200,12 +217,14 @@ export class User {
                 await new Promise((resolve) => {
                     setTimeout(resolve, 2 * 1000);
                 })
-                const { data: {
-                    code,
-                    message,
-                    data
-                } } = await $axios.request<BiliAPIResponse<LoginResponse>>({
-                    url: "http://passport.bilibili.com/x/passport-tv-login/qrcode/poll",
+                const {
+                    data: {
+                        code,
+                        message,
+                        data
+                    }
+                } = await $axios.request<BiliAPIResponse<LoginResponse>>({
+                    url: "https://passport.bilibili.com/x/passport-tv-login/qrcode/poll",
                     method: "post",
                     params
                 })
@@ -233,9 +252,11 @@ export class User {
                 'ts': (+new Date()).toString().substr(0, 10)
             }
             params.sign = md5(crypt.make_sign(params, "59b43e04ad6965f34319062b478f83dd"))
-            const { data: {
-                code, message, data
-            } } = await $axios.request<BiliAPIResponse<GetQRCodeResponse>>({
+            const {
+                data: {
+                    code, message, data
+                }
+            } = await $axios.request<BiliAPIResponse<GetQRCodeResponse>>({
                 url: "http://passport.bilibili.com/x/passport-tv-login/qrcode/auth_code",
                 method: "post",
                 params

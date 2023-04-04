@@ -19,6 +19,9 @@ export type LoginResponse = {
 export type GetUserInfoResponse = {
     name: string
     mid: number
+    access_token: string
+    expires_in: number
+    refresh: boolean
 }
 
 export type TokenInfo = {
