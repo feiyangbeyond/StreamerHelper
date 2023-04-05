@@ -2,6 +2,7 @@ FROM node:alpine
 WORKDIR /app
 # copy project file
 COPY package.json .
+COPY package-lock.json .
 # install ffmpeg
 RUN apk update && \
     apk add yasm && \

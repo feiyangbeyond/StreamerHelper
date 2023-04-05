@@ -54,7 +54,7 @@ export class uploader {
         this.videoPartLimitSizeInput = global.config.StreamerHelper.videoPartLimitSize ?? 100
         this.copyright = recorderTask.streamerInfo.copyright || 2
         this.cover = ''
-        this.desc = recorderTask.streamerInfo.desc || `Powered By StreamerHelper. https://github.com/ZhangMingZhao1/StreamerHelper`
+        this.desc = recorderTask.streamerInfo.desc || ``
         this.no_reprint = 0
         this.open_elec = 1
         this.source = recorderTask.streamerInfo.source || `${recorderTask.recorderName} 直播间: ${recorderTask.streamerInfo.roomUrl}`
