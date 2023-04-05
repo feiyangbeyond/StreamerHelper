@@ -4,7 +4,8 @@ WORKDIR /app
 COPY package.json .
 COPY package-lock.json .
 # install ffmpeg
-RUN apk update && \
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories && \
+    apk update && \
     apk add yasm && \
     apk add ffmpeg python3 make gcc g++ musl-dev tzdata && \
     cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
